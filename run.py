@@ -1,14 +1,17 @@
 # Установка requests: sudo pip3 install requests
 # Если не установлен pip3: sudo apt-get install python3-pip
 # requests - модуль для удобной работы с запросами и ответами
+from tkinter import *
 import requests
 import json
 import settings
 from datetime import datetime, date
 
+
+
 # id городов с названиями и координатами тут: http://bulk.openweathermap.org/sample/city.list.json.gz
 # - Это обычный .json  в архиве
-city_name = input('Введите на англ яз название города который вам нужен из перечисленных (Horten,Novokuznetsk,Carolina) :  ')
+city_name = input('Введите на англ яз название города который вам нужен из перечисленных (Novokuznetsk,Carolina) :  ')
 
 
 
@@ -57,10 +60,10 @@ def run():
         if 329 > deg > 300:
              print('Направление на Юго-восток')
         if 360 > deg > 330:
-             print('Направление на Восток')
-             print('Температура = ', response.json()['main']['temp_max'] - 273, '°C')
-             date_mc = response.json()['dt']  # Дата в микросекундах
-             print('Дата и время последнего запроса = ', datetime.fromtimestamp(date_mc))
+            print('Направление на Восток')
+        print('Температура = ', response.json()['main']['temp_max'] - 273, '°C')
+        date_mc = response.json()['dt']  # Дата в микросекундах
+        print('Дата и время последнего запроса = ', datetime.fromtimestamp(date_mc))
      # Подробнее про HTTP запросы тут: http://ruseller.com/lessons.php?rub=28&id=1726
      #request - запрос, response - ответ
 
