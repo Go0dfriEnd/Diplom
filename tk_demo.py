@@ -4,11 +4,12 @@ import json
 
 def allname():
     op=open("city.list.json")
+    lst = []
     for line in op:
         lol=json.loads(line)
         name=lol.get('name')
-        name1=[name]
-    return name1
+        lst.append(lol.get('name'))
+    return lst
 
 
 
