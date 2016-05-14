@@ -11,7 +11,7 @@ from datetime import datetime, date
 
 # id городов с названиями и координатами тут: http://bulk.openweathermap.org/sample/city.list.json.gz
 # - Это обычный .json  в архиве
-city_name = input('Введите на англ яз название города который вам нужен из перечисленных (Novokuznetsk,Carolina) :  ')
+city_name = input('Введите на англ яз название города который вам нужен из перечисленных  :  ')
 
 
 
@@ -24,6 +24,12 @@ for line in op:
         city_id = city["_id"]
         break
 
+def allname():
+    op=open("city.list.json")
+    for line in op:
+        lol=json.loads(line)
+        name=print(lol.get('name'))
+        name1=[name]
 
 
 

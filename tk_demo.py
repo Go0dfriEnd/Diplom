@@ -1,9 +1,20 @@
 from tkinter import *
 from tkinter.ttk import *
+import json
+
+def allname():
+    op=open("city.list.json")
+    for line in op:
+        lol=json.loads(line)
+        name=lol.get('name')
+        name1=[name]
+    return name1
+
+
 
 root = Tk()
 root.geometry("400x470")
-combobox = Combobox(root, values=[u"Novokuznetsk", u"Horten", u"Carolina"], font="Arial 12")
+combobox = Combobox(root, values=allname(), font="Arial 12")
 # frame - задает родительский виджет, на его территории будет располагаться Combobox
 # values - задает набор значений, которые будут содержаться в Combobox изначально
 # height - задает высоту выпадающего списка. Если число элементов списка меньше 11, то можно не задавать.
