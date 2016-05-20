@@ -1,6 +1,44 @@
 from tkinter import *
 from tkinter.ttk import *
 import json
+import requests
+import settings
+from datetime import datetime, date
+
+
+def run():
+     if response.json().get('cod') == '404':
+         print("Неверно задан город")
+     else:
+        print('id=  ',response.json()['id'])
+        print('Страна = ', response.json()['sys']['country'])
+        print('Город = ', response.json()['name'])
+        print('Скорость ветра = ', response.json()['wind']['speed'], 'Метров в секунду')
+        deg = response.json()['wind']['deg']
+        print('напр ветра --> ', deg)
+        if 30 > deg >= 0:
+            print('Направление', 'на Восток')
+        if 60 > deg > 31:
+            print('Направление', 'на Северо-восток')
+        if 119 > deg > 61:
+            print('Направление', 'на Север')
+        if 149 > deg > 120:
+            print('Направление  на Северо-запад')
+        if 209 > deg > 150:
+            print('Направление на Запад')
+        if 239 > deg > 210:
+             print('Направление на Юго-запад')
+        if 299 > deg > 240:
+            print('Направление на Юг')
+        if 329 > deg > 300:
+             print('Направление на Юго-восток')
+        if 360 > deg > 330:
+            print('Направление на Восток')
+        print('Температура = ', response.json()['main']['temp_max'] - 273, '°C')
+        date_mc = response.json()['dt']  # Дата в микросекундах
+        print('Дата и время последнего запроса = ', datetime.fromtimestamp(date_mc))
+     # Подробнее про HTTP запросы тут: http://ruseller.com/lessons.php?rub=28&id=1726
+     #request - запрос, response - ответ
 
 def allname():
     op=open("city.list.json")
@@ -11,10 +49,15 @@ def allname():
         lst.append(lol.get('name'))
     return lst
 
+def newselection(event):
+    event = combobox.get()
+    print(event)
+    op=open('city.list.json')
+    run()
 
 
 root = Tk()
-root.geometry("400x470")
+root.geometry("450x470")
 combobox = Combobox(root, values=allname(), font="Arial 12")
 # frame - задает родительский виджет, на его территории будет располагаться Combobox
 # values - задает набор значений, которые будут содержаться в Combobox изначально
@@ -26,12 +69,26 @@ combobox.set(u"Выберите город")  # спомощью этой стр
 combobox.grid(column=0, row=0)  # Позиционируем Combobox на форме
 
 
+city_name=input('Введите город :  ')
 
 
-label1 = Label(root, text="Температура \n осадки ", font="Arial 12")
-label2 = Label(root, text="Направление ветра \n  скорость", font="Arial 12")
+op = open('city.list.json')
+city_id = None
+for line in op:
+    city = json.loads(line)
+    if city_name == city['name']:
+        city_id = city["_id"]
+    break
+
+params = {'id': city_id, 'APPID': settings.APPID}
+response = requests.get(settings.url, params=params)
+
+
+combobox.bind("<<ComboboxSelected>>",newselection)
+label1 = Label(root, text=response.json()['main']['temp_max'] - 273, font="Arial 12")
+label2 = Label(root, text=response.json()['wind']['speed'],font="Arial 12")
 label3 = Label(root, text="Тут \n будет \n картинка", font="Arial 12")
-label = Label(text="Дата", font="Arial 12")
+label = Label(text= datetime.fromtimestamp(response.json()['dt']),font="Arial 12")
 # button.bind(, on_click)
 # but.grid(row=0,column=0)
 label.grid(row=0, column=2)
@@ -39,5 +96,12 @@ label1.grid(row=2, column=0)
 label2.grid(row=2, column=2)
 label3.grid(row=1, column=1)
 
+
+
+try:#Перехватывает сетевую ошибку
+     response = requests.get(settings.url, params=params)
+     run()
+except requests.exceptions.ConnectionError:
+     print("Нет соединения с сервером")
 
 root.mainloop()

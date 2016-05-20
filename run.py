@@ -1,7 +1,6 @@
 # Установка requests: sudo pip3 install requests
 # Если не установлен pip3: sudo apt-get install python3-pip
 # requests - модуль для удобной работы с запросами и ответами
-from tkinter import *
 import requests
 import json
 import settings
