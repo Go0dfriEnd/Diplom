@@ -10,28 +10,42 @@ from datetime import datetime, date
 
 # id городов с названиями и координатами тут: http://bulk.openweathermap.org/sample/city.list.json.gz
 # - Это обычный .json  в архиве
-city_name = input('Введите на англ яз название города который вам нужен из перечисленных  :  ')
+#city_name = input('Введите на англ яз название города который вам нужен из перечисленных  :  ')
 
 
 
 # TODO: (Complete)если отправить несуществующий id, то вернется json  с ошибкой. Доделать обарботку таких ошибок.
-op = open('city.list.json')
+#op = open('city.list.json')
+#city_id = None
+#for line in op:
+#    city = json.loads(line)
+#    if city_name == city['name']:
+#        city_id = city["_id"]
+#        break
+
+def allname():
+    op=open("city.list.json",encoding='UTF-8')
+    lst = []
+    for line in op:
+        lol=json.loads(line)
+        name=lol.get('name')
+        lst.append(lol.get('name'))
+        id1=lol.get('_id')
+        print('id',id1,'=',name)
+    return lst
+
+
+allname()
+
+
+city_name = input('Введите на англ яз название города который вам нужен из перечисленных  :  ')
+op = open('city.list.json',encoding='UTF-8')
 city_id = None
 for line in op:
     city = json.loads(line)
     if city_name == city['name']:
         city_id = city["_id"]
         break
-
-def allname():
-    op=open("city.list.json")
-    for line in op:
-        lol=json.loads(line)
-        name=print(lol.get('name'))
-        name1=[name]
-
-
-
 params = {'id': city_id, 'APPID': settings.APPID}
 
 
@@ -42,7 +56,7 @@ def run():
      else:
         #print('full_result = ', response.json())
         #print('all_keys = ', response.json().keys())
-        print('id=  ',response.json()['id'])
+        print('id = ',response.json()['id'])
         print('Страна = ', response.json()['sys']['country'])
         print('Город = ', response.json()['name'])
         print('Скорость ветра = ', response.json()['wind']['speed'], 'Метров в секунду')
