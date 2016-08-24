@@ -5,8 +5,8 @@ import requests
 import settings
 from datetime import datetime, date
 
-
-def run():
+# Запрашивает данные о погоде у сайта и показывает их в консоли
+def conclusionweather():
      if response.json().get('cod') == '404':
          print("Неверно задан город")
      else:
@@ -39,7 +39,7 @@ def run():
         print('Дата и время последнего запроса = ', datetime.fromtimestamp(date_mc))
      # Подробнее про HTTP запросы тут: http://ruseller.com/lessons.php?rub=28&id=1726
      #request - запрос, response - ответ
-
+#Пишет все имена городов которые есть в файле city.list.json
 def allname():
     op=open("city.list.json",encoding='UTF-8')
     lst = []
@@ -48,7 +48,7 @@ def allname():
         name=lol.get('name')
         lst.append(lol.get('name'))
     return lst
-
+#Выполняет действие при выборе города в списке в граф часте
 def newselection(event):
     event = combobox.get()
     print(event)
@@ -73,16 +73,16 @@ allname()
 
 city_name=input('Введите город :  ')
 
-
-op = open('city.list.json',encoding='UTF-8')
-city_id = None
-for line in op:
-    city = json.loads(line)
-    if city_name == city['name']:
-        city_id = city["_id"]
-        break
-
-
+#Находит id выбранного города
+def find_id():
+    op = open('city.list.json',encoding='UTF-8')
+    city_id = None
+    for line in op:
+        city = json.loads(line)
+        if city_name == city['name']:
+            city_id = city["_id"]
+            break
+find_id()
 
 combobox.bind("<<ComboboxSelected>>",newselection)
 params = {'id': city_id, 'APPID': settings.APPID}
@@ -105,7 +105,7 @@ label2.grid(row=2, column=2)
 
 try:#Перехватывает сетевую ошибку
      response = requests.get(settings.url, params=params)
-     run()
+     conclusionweather()
 except requests.exceptions.ConnectionError:
      print("Нет соединения с сервером")
 
