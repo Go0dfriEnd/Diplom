@@ -5,12 +5,21 @@ import requests
 import settings
 from datetime import datetime, date
 
+
 # Запрашивает данные о погоде у сайта и показывает их в консоли
+# TODO: В функции нет ни единой строчки с запросом к сайту.
+# TODO: Если ты делаешь графическую программу, то зачем она что-то показывает в консоли?
+# TODO: В функции есть алгоритм определения направления ветра, его нужно вынести в отдельную функцию
+# TODO: Для улучшения читабельности кода - функции должны отдельяться друг от друга двумя пустыми строками(я добавил)
 def conclusionweather():
-     if response.json().get('cod') == '404':
-         print("Неверно задан город")
-     else:
-        print('id=  ',response.json()['id'])
+    """
+    !!!Комментарии к функции делают не перед ней,
+    а в виде многострочного комметария в начале функции
+    """
+    if response.json().get('cod') == '404':
+        print("Неверно задан город")
+    else:
+        print('id=  ', response.json()['id'])
         print('Страна = ', response.json()['sys']['country'])
         print('Город = ', response.json()['name'])
         print('Скорость ветра = ', response.json()['wind']['speed'], 'Метров в секунду')
@@ -27,35 +36,58 @@ def conclusionweather():
         if 209 > deg > 150:
             print('Направление на Запад')
         if 239 > deg > 210:
-             print('Направление на Юго-запад')
+            print('Направление на Юго-запад')
         if 299 > deg > 240:
             print('Направление на Юг')
         if 329 > deg > 300:
-             print('Направление на Юго-восток')
+            print('Направление на Юго-восток')
         if 360 > deg > 330:
             print('Направление на Восток')
         print('Температура = ', response.json()['main']['temp_max'] - 273, '°C')
         date_mc = response.json()['dt']  # Дата в микросекундах
         print('Дата и время последнего запроса = ', datetime.fromtimestamp(date_mc))
-     # Подробнее про HTTP запросы тут: http://ruseller.com/lessons.php?rub=28&id=1726
-     #request - запрос, response - ответ
-#Пишет все имена городов которые есть в файле city.list.json
+        # Подробнее про HTTP запросы тут: http://ruseller.com/lessons.php?rub=28&id=1726
+        # request - запрос, response - ответ
+
+
+# Выводит в консоль города которые есть в файле city.list.json
+# TODO: Куда она их пишет?
+#(в консоль)
 def allname():
-    op=open("city.list.json",encoding='UTF-8')
+    op = open("city.list.json", encoding='UTF-8')
     lst = []
     for line in op:
-        lol=json.loads(line)
-        name=lol.get('name')
+        lol = json.loads(line)
+        name = lol.get('name')
         lst.append(lol.get('name'))
     return lst
-#Выполняет действие при выборе города в списке в граф часте
+
+
+# Выполняет действие при выборе города в списке в граф часте
+# TODO: Какое действие она выполняет?
+# TODO: Зачем внутри вызывается функция run(), если этой функции вообще нет?
 def newselection(event):
     event = combobox.get()
     print(event)
-    op=open('city.list.json')
-    run()
-    city_name=event
+    op = open('city.list.json')
+    city_name = event
 
+
+# Находит id выбранного города
+# TODO: И что она с ним делает после того как найдет?
+# TODO: Почитай что такое локальные и глобальные переменные...
+# TODO: Все объявления функций должны находиться в начале файла(я переместил эту функцию выше)'
+city_name=None
+def find_id():
+    op = open('city.list.json', encoding='UTF-8')
+    city_id = None
+    for line in op:
+        city = json.loads(line)
+        if city_name == city['name']:
+            city_id = city["_id"]
+            break
+
+# Начало программы! Все объявления функций должны быть выше.
 root = Tk()
 root.geometry("450x470")
 combobox = Combobox(root, values=allname(), font="Arial 12")
@@ -68,45 +100,38 @@ combobox = Combobox(root, values=allname(), font="Arial 12")
 combobox.set(u"Выберите город")  # спомощью этой строчки мы установим Combobox в значение ОДИН изначально
 combobox.grid(column=0, row=0)  # Позиционируем Combobox на форме
 
+# TODO: Для чего ты вызвал эту функцию в этом месте программы?
+#allname()
 
-allname()
+# TODO: Если ты делаешь графическую программу, то зачем название города запрашиваешь в консоли?
+#city_name = input('Введите город :  ')
 
-city_name=input('Введите город :  ')
-
-#Находит id выбранного города
-def find_id():
-    op = open('city.list.json',encoding='UTF-8')
-    city_id = None
-    for line in op:
-        city = json.loads(line)
-        if city_name == city['name']:
-            city_id = city["_id"]
-            break
 find_id()
 
-combobox.bind("<<ComboboxSelected>>",newselection)
-params = {'id': city_id, 'APPID': settings.APPID}
+combobox.bind("<<ComboboxSelected>>", newselection)
+# TODO: Тебе же подчеркнули переменную city_id красной чертой - это значит переменная не объявлена.
+#params = {'id': city_id, 'APPID': settings.APPID}
 
-response = requests.get(settings.url, params=params)
+# TODO: Что делает эта строчка кода?
+response = requests.get(settings.url,)
 
-
-#combobox.bind("<<ComboboxSelected>>",newselection)
+# combobox.bind("<<ComboboxSelected>>",newselection)
+# TODO: Какой результат возвращает выражение: response.json()['main']['temp_max'] - 273 ?
+# (возвращает температуру в Фаренгейту и я ее превращаю в цельсий)
 label1 = Label(root, text=response.json()['main']['temp_max'] - 273, font="Arial 12")
 label2 = Label(root, text=response.json()['wind']['speed'], font="Arial 12")
-label = Label(text= datetime.fromtimestamp(response.json()['dt']), font="Arial 12")
+label = Label(text=datetime.fromtimestamp(response.json()['dt']), font="Arial 12")
 # button.bind(, on_click)
 # but.grid(row=0,column=0)
 label.grid(row=0, column=2)
 label1.grid(row=2, column=0)
 label2.grid(row=2, column=2)
 
+try:  # Перехватывает сетевую ошибку
+# TODO: Зачем ты снова написал это? Тоже самое написано чуть выше!
+# TODO: Для чео ты вызвал тут эту функцию?
 
-
-
-try:#Перехватывает сетевую ошибку
-     response = requests.get(settings.url, params=params)
-     conclusionweather()
 except requests.exceptions.ConnectionError:
-     print("Нет соединения с сервером")
+    print("Нет соединения с сервером")
 
 root.mainloop()
