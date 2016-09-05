@@ -7,7 +7,7 @@ from datetime import datetime, date
 
 
 # Запрашивает данные о погоде у сайта и показывает их в консоли
-# TODO: В функции нет ни единой строчки с запросом к сайту.
+# TODO: В функции нет ни единой строчки с запросом к сайту.(response)
 # TODO: Если ты делаешь графическую программу, то зачем она что-то показывает в консоли?
 # TODO: В функции есть алгоритм определения направления ветра, его нужно вынести в отдельную функцию
 # TODO: Для улучшения читабельности кода - функции должны отдельяться друг от друга двумя пустыми строками(я добавил)
@@ -50,9 +50,30 @@ def conclusionweather():
         # request - запрос, response - ответ
 
 
+def wind():#Алгоритм определения направления ветра
+    deg = response.json()['wind']['deg']
+    print('напр ветра --> ', deg)
+    if 30 > deg >= 0:
+        print('Направление', 'на Восток')
+    if 60 > deg > 31:
+        print('Направление', 'на Северо-восток')
+    if 119 > deg > 61:
+        print('Направление', 'на Север')
+    if 149 > deg > 120:
+        print('Направление  на Северо-запад')
+    if 209 > deg > 150:
+        print('Направление на Запад')
+    if 239 > deg > 210:
+        print('Направление на Юго-запад')
+    if 299 > deg > 240:
+        print('Направление на Юг')
+    if 329 > deg > 300:
+        print('Направление на Юго-восток')
+    if 360 > deg > 330:
+        print('Направление на Восток')
+
 # Выводит в консоль города которые есть в файле city.list.json
-# TODO: Куда она их пишет?
-#(в консоль)
+# TODO: Куда она их пишет? (В консоль)
 def allname():
     op = open("city.list.json", encoding='UTF-8')
     lst = []
@@ -63,29 +84,36 @@ def allname():
     return lst
 
 
-# Выполняет действие при выборе города в списке в граф часте
+# Выполняет  любое действие которые вы пропишите внутри этой функиции при выборе города в списке в граф часте
 # TODO: Какое действие она выполняет?
-# TODO: Зачем внутри вызывается функция run(), если этой функции вообще нет?
+# TODO: Зачем внутри вызывается функция run(), если этой функции вообще нет?(Функция была переименованна,щас я ее убрал)
 def newselection(event):
     event = combobox.get()
     print(event)
     op = open('city.list.json')
+    # conclusionweather()
     city_name = event
+    return city_name
 
 
 # Находит id выбранного города
 # TODO: И что она с ним делает после того как найдет?
 # TODO: Почитай что такое локальные и глобальные переменные...
-# TODO: Все объявления функций должны находиться в начале файла(я переместил эту функцию выше)'
-city_name=None
-def find_id():
-    op = open('city.list.json', encoding='UTF-8')
-    city_id = None
-    for line in op:
+# TODO: Все объявления функций должны находиться в начале файла(я переместил эту функцию выше)
+
+def find_id(city_name):
+    """
+    Принимает название города, возвращает его id
+    """
+    # Открываем файл с городами на чтение
+    f_cities = open('city.list.json', encoding='UTF-8')
+    for line in f_cities:
+        # Преобразуем формат JSON к словарю Python
         city = json.loads(line)
+        # Для каждого города в файле city.list.json сравниваем название с искомым
         if city_name == city['name']:
-            city_id = city["_id"]
-            break
+            # Если нашли город в файле с нужным именем, возвращаем его id
+            return city["_id"]
 
 # Начало программы! Все объявления функций должны быть выше.
 root = Tk()
@@ -100,7 +128,7 @@ combobox = Combobox(root, values=allname(), font="Arial 12")
 combobox.set(u"Выберите город")  # спомощью этой строчки мы установим Combobox в значение ОДИН изначально
 combobox.grid(column=0, row=0)  # Позиционируем Combobox на форме
 
-# TODO: Для чего ты вызвал эту функцию в этом месте программы?
+# TODO: Для чего ты вызвал эту функцию в этом месте программы?(Чтобы пользователь знал какие города есть в списке)
 #allname()
 
 # TODO: Если ты делаешь графическую программу, то зачем название города запрашиваешь в консоли?
@@ -110,14 +138,14 @@ find_id()
 
 combobox.bind("<<ComboboxSelected>>", newselection)
 # TODO: Тебе же подчеркнули переменную city_id красной чертой - это значит переменная не объявлена.
-#params = {'id': city_id, 'APPID': settings.APPID}
+params = {'id': city_id, 'APPID': settings.APPID}
 
 # TODO: Что делает эта строчка кода?
-response = requests.get(settings.url,)
+response = requests.get(settings.url, params=params)
 
 # combobox.bind("<<ComboboxSelected>>",newselection)
 # TODO: Какой результат возвращает выражение: response.json()['main']['temp_max'] - 273 ?
-# (возвращает температуру в Фаренгейту и я ее превращаю в цельсий)
+#Запрашивает у сайта температуру по Фаренгейту а я ее преобразовываю в Цельсий
 label1 = Label(root, text=response.json()['main']['temp_max'] - 273, font="Arial 12")
 label2 = Label(root, text=response.json()['wind']['speed'], font="Arial 12")
 label = Label(text=datetime.fromtimestamp(response.json()['dt']), font="Arial 12")
@@ -128,9 +156,10 @@ label1.grid(row=2, column=0)
 label2.grid(row=2, column=2)
 
 try:  # Перехватывает сетевую ошибку
-# TODO: Зачем ты снова написал это? Тоже самое написано чуть выше!
-# TODO: Для чео ты вызвал тут эту функцию?
-
+    # TODO: Зачем ты снова написал это? Тоже самое написано чуть выше!(Убрал)
+    # TODO: Для чео ты вызвал тут эту функцию?
+    #Щас такая штука возникла если я уберу эту строку или кину ее в коментарий то ваше TODO будет выдавать ошибку
+    conclusionweather()
 except requests.exceptions.ConnectionError:
     print("Нет соединения с сервером")
 
